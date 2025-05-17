@@ -1,0 +1,30 @@
+{% extends 'network/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}Створити маршрут{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="route-create-container">
+  <h2 class="route-create-title">Створити маршрут</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="route-create-group">
+        <label class="route-create-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field|add_class:"route-create-input" }}
+        {% if field.help_text %}
+          <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <div class="route-create-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="route-create-btn">Зберегти маршрут 🚀</button>
+  </form>
+</div>
+{% endblock %}

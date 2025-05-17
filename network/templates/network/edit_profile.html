@@ -1,0 +1,18 @@
+{% extends 'network/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Редагувати профіль{% endblock %}
+
+{% block content %}
+<div class="edit-profile-container">
+    <div class="edit-card">
+        <h2 class="edit-title">Редагувати профіль</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="save-btn">💾 Зберегти зміни</button>
+        </form>
+        <a href="{% url 'profile' username=request.user.username %}" class="back-link">← Назад до профілю</a>
+    </div>
+</div>
+{% endblock %}

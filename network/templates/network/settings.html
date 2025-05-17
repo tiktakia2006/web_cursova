@@ -1,0 +1,95 @@
+{% extends 'network/base.html' %}
+{% block title %}Налаштування{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <h2 class="mb-4 text-primary">Налаштування профілю</h2>
+  <form>
+    <div class="row g-4">
+
+      <div class="col-md-6">
+        <label for="username" class="form-label fw-semibold">Ім'я користувача</label>
+        <input type="text" class="form-control" id="username" placeholder="Введіть нове ім'я">
+      </div>
+
+      <div class="col-md-6">
+        <label for="email" class="form-label fw-semibold">Електронна пошта</label>
+        <input type="email" class="form-control" id="email" placeholder="email@example.com">
+      </div>
+
+      <div class="col-md-6">
+        <label for="password" class="form-label fw-semibold">Новий пароль</label>
+        <input type="password" class="form-control" id="password" placeholder="Введіть новий пароль">
+      </div>
+
+      <div class="col-md-6">
+        <label for="passwordConfirm" class="form-label fw-semibold">Підтвердьте пароль</label>
+        <input type="password" class="form-control" id="passwordConfirm" placeholder="Повторіть пароль">
+      </div>
+
+      <div class="col-md-6">
+        <label for="avatar" class="form-label fw-semibold">Аватар</label>
+        <input class="form-control" type="file" id="avatar" accept="image/*">
+      </div>
+
+      <div class="col-md-6">
+        <label for="language" class="form-label fw-semibold">Мова інтерфейсу</label>
+        <select id="language" class="form-select">
+          <option selected>Українська</option>
+          <option>English</option>
+          <option>Polski</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">Сповіщення</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+          <label class="form-check-label" for="emailNotifications">
+            Email сповіщення
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="pushNotifications">
+          <label class="form-check-label" for="pushNotifications">
+            Push сповіщення
+          </label>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">Приватність профілю</label>
+        <select id="privacy" class="form-select">
+          <option value="public" selected>Відкритий профіль</option>
+          <option value="friends">Тільки друзі</option>
+          <option value="private">Приватний</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label fw-semibold">Тема інтерфейсу</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="theme" id="themeLight" value="light" checked>
+          <label class="form-check-label" for="themeLight">Світла</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="theme" id="themeDark" value="dark">
+          <label class="form-check-label" for="themeDark">Темна</label>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label for="social" class="form-label fw-semibold">Посилання на соціальні мережі</label>
+        <input type="url" class="form-control mb-2" id="socialFacebook" placeholder="Facebook URL">
+        <input type="url" class="form-control mb-2" id="socialTwitter" placeholder="Twitter URL">
+        <input type="url" class="form-control" id="socialInstagram" placeholder="Instagram URL">
+      </div>
+
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-primary px-4">Зберегти зміни</button>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}

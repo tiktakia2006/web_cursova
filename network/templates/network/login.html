@@ -1,0 +1,16 @@
+{% extends 'network/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Вхід - WanderNet{% endblock %}
+
+{% block content %}
+<h2>Вхід</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="button">Увійти</button>
+</form>
+
+<p class="reg-text">Немає акаунту? <a href="{% url 'register' %}">Зареєструватися</a></p>
+{% endblock %}

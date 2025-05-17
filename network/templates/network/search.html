@@ -1,0 +1,28 @@
+{% extends 'network/base.html' %}
+
+{% block title %}Пошук - WanderNet{% endblock %}
+
+{% block content %}
+<h2>Пошук</h2>
+
+<form method="get" action="{% url 'search' %}">
+    <input type="text" name="query" placeholder="Пошук..." value="{{ request.GET.query }}">
+    <button type="submit">Пошук</button>
+</form>
+
+{% if posts %}
+    <h3>Результати пошуку:</h3>
+    {% for post in posts %}
+        <div class="post-card">
+            <h3>{{ post.user.username }}</h3>
+            <p>{{ post.caption }}</p>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="Фото подорожі">
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Нічого не знайдено.</p>
+{% endif %}
+
+{% endblock %}

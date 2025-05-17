@@ -1,0 +1,66 @@
+{% extends 'network/base.html' %}
+{% load static %}
+
+{% block title %}Головна - WanderNet{% endblock %}
+
+{% block content %}
+<h2 class="feed-title">Стрічка мандрівників</h2>
+
+<div class="post-feed">
+    {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <strong>@{{ post.user.username }}</strong>
+                <span class="post-date">{{ post.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+
+            <p class="post-caption">{{ post.caption }}</p>
+
+            {% if post.image %}
+                <div class="post-image">
+                    <img src="{{ post.image.url }}" alt="Фото подорожі">
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'like_post' post.id %}" class="like-form">
+                {% csrf_token %}
+                <button type="submit" class="like-button">❤️ {{ post.likes.count }}</button>
+            </form>
+
+     <div class="comments-section">
+    <button class="toggle-comments-btn btn btn-sm btn-outline-primary mb-2" type="button">
+        💬 Показати коментарі ({{ post.comments.count }})
+    </button>
+
+    <div class="comments-container" style="display: none;">
+        <div class="comments">
+            {% for comment in post.comments.all %}
+                <div class="comment">
+                    <strong>{{ comment.user.username }}</strong>:
+                    <span>{{ comment.content }}</span>
+                    <small class="comment-date">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+            {% empty %}
+                <p class="no-comments">Поки що немає коментарів.</p>
+            {% endfor %}
+        </div>
+
+        {% if user.is_authenticated %}
+            <form method="post" class="comment-form" data-post-id="{{ post.id }}">
+                {% csrf_token %}
+                <textarea name="content" rows="2" class="form-control" placeholder="Залишити коментар..."></textarea>
+                <input type="hidden" name="comment_post_id" value="{{ post.id }}">
+                <button type="submit" class="btn btn-outline-success btn-sm mt-1">Додати</button>
+            </form>
+        {% else %}
+            <p class="login-comment">Щоб коментувати, <a href="{% url 'login' %}">увійдіть</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+        </div>
+    {% empty %}
+        <p class="no-posts">Наразі немає постів.</p>
+    {% endfor %}
+</div>
+{% endblock %}
