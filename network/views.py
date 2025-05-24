@@ -1,26 +1,52 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import get_user_model, login, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
-from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from .forms import CustomRegisterForm, RouteForm, UserForm, PostForm, ProfileEditForm, CommentForm
+from .forms import CustomRegisterForm, RouteForm, PostForm, ProfileEditForm, CommentForm, SettingsForm
 from .models import Post, Route, Profile, Comment, FriendRequest
-from django.contrib.auth.models import User
 
+User = get_user_model()
+
+def admin_required(user):
+    return user.is_authenticated and user.is_admin()
+
+@login_required
+@user_passes_test(admin_required)
+def users_list(request):
+    users = User.objects.all().order_by('username')
+    return render(request, 'network/users_list.html', {'users': users})
+
+@login_required
+@user_passes_test(admin_required)
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.delete()
+    messages.success(request, "Пост видалено.")
+    return redirect('home')
+
+@login_required
+@user_passes_test(admin_required)
+def delete_user(request, user_id):
+    user_to_delete = get_object_or_404(User, id=user_id)
+    if user_to_delete != request.user:
+        user_to_delete.delete()
+        messages.success(request, f"Користувача {user_to_delete.username} видалено.")
+    else:
+        messages.error(request, "Ви не можете видалити себе.")
+    return redirect('home')
 
 @login_required
 def notifications(request):
-
-    friends = request.user.profile.friends.all()
-
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    friends = profile.friends.all()
     friend_posts = Post.objects.filter(user__in=friends).order_by('-created_at')
-
     return render(request, 'network/notifications.html', {'friend_posts': friend_posts})
+
 @login_required
 @require_POST
 def add_route_comment(request):
@@ -43,8 +69,9 @@ def add_route_comment(request):
         'content': comment.content,
         'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M')
     })
-@require_POST
+
 @login_required
+@require_POST
 def add_comment(request):
     post_id = request.POST.get('post_id')
     content = request.POST.get('content')
@@ -65,6 +92,7 @@ def add_comment(request):
         'content': comment.content,
         'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M')
     })
+
 def home(request):
     posts = Post.objects.all().order_by('-created_at')
 
@@ -81,7 +109,8 @@ def home(request):
 
     comment_forms = {post.id: CommentForm() for post in posts}
     return render(request, 'network/home.html', {'posts': posts, 'comment_forms': comment_forms})
-# Лайк посту
+
+@login_required
 def like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user.is_authenticated:
@@ -91,7 +120,7 @@ def like_post(request, post_id):
             post.likes.add(request.user)
     return redirect('home')
 
-@login_required(login_url='login')
+@login_required
 def create_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -107,24 +136,17 @@ def create_post(request):
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
     posts = Post.objects.filter(user=user)
-
     total_likes = sum(post.likes.count() for post in posts)
-
     return render(request, 'network/profile.html', {
         'user': user,
         'posts': posts,
         'total_likes': total_likes,
     })
 
-
-
 @login_required
 def edit_profile(request):
     user = request.user
-    try:
-        profile = user.profile
-    except Profile.DoesNotExist:
-        profile = None
+    profile, _ = Profile.objects.get_or_create(user=user)
 
     if request.method == 'POST':
         form = ProfileEditForm(request.POST, request.FILES, instance=profile)
@@ -133,8 +155,8 @@ def edit_profile(request):
             profile.user = user
             profile.save()
 
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
+            user.first_name = form.cleaned_data.get('first_name', user.first_name)
+            user.last_name = form.cleaned_data.get('last_name', user.last_name)
             user.save()
 
             return redirect('profile', username=user.username)
@@ -142,12 +164,11 @@ def edit_profile(request):
         form = ProfileEditForm(instance=profile)
 
     return render(request, 'network/edit_profile.html', {'form': form})
+
+@login_required
 def routes(request):
-    route_list = Route.objects.all()
-    paginator = Paginator(route_list, 10)
-    page_number = request.GET.get('page')
-    routes_page = paginator.get_page(page_number)
-    return render(request, 'network/routes.html', {'routes': routes_page})
+    all_routes = Route.objects.select_related('user').order_by('-id')
+    return render(request, 'network/routes.html', {'routes': all_routes})
 
 def site_settings(request):
     return render(request, 'network/settings.html')
@@ -168,10 +189,11 @@ def route_detail(request, route_id):
     return render(request, 'network/route_detail.html', {
         'route': route
     })
+
 def search(request):
     query = request.GET.get('q', '')
     posts = Post.objects.filter(Q(caption__icontains=query) | Q(user__username__icontains=query))
-    routes = Route.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+    routes = Route.objects.filter(Q(start_location__icontains=query) | Q(description__icontains=query))
     return render(request, 'network/search.html', {'posts': posts, 'routes': routes, 'query': query})
 
 def register_view(request):
@@ -196,8 +218,6 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'network/login.html', {'form': form})
 
-
-
 @login_required
 def find_friends(request):
     query = request.GET.get('q', '')
@@ -206,8 +226,9 @@ def find_friends(request):
     if query:
         results = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
 
+    profile, _ = Profile.objects.get_or_create(user=request.user)
     sent_requests = FriendRequest.objects.filter(from_user=request.user).values_list('to_user_id', flat=True)
-    friends = request.user.profile.friends.all()
+    friends = profile.friends.all()
 
     return render(request, 'network/find_friends.html', {
         'results': results,
@@ -224,8 +245,9 @@ def add_friend(request, user_id):
 
 @login_required
 def friends_list(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
     received_requests = FriendRequest.objects.filter(to_user=request.user)
-    friends = request.user.profile.friends.all()
+    friends = profile.friends.all()
     return render(request, 'network/friends_list.html', {
         'received_requests': received_requests,
         'friends': friends
@@ -234,11 +256,13 @@ def friends_list(request):
 @login_required
 def accept_friend(request, user_id):
     from_user = get_object_or_404(User, id=user_id)
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    from_profile, _ = Profile.objects.get_or_create(user=from_user)
     friend_request = FriendRequest.objects.filter(from_user=from_user, to_user=request.user).first()
 
     if friend_request:
-        request.user.profile.friends.add(from_user)
-        from_user.profile.friends.add(request.user)
+        profile.friends.add(from_user)
+        from_profile.friends.add(request.user)
         friend_request.delete()
 
     return redirect('friends')
@@ -246,8 +270,10 @@ def accept_friend(request, user_id):
 @login_required
 def remove_friend(request, user_id):
     friend = get_object_or_404(User, id=user_id)
-    request.user.profile.friends.remove(friend)
-    friend.profile.friends.remove(request.user)
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    friend_profile, _ = Profile.objects.get_or_create(user=friend)
+    profile.friends.remove(friend)
+    friend_profile.friends.remove(request.user)
     messages.success(request, f"{friend.username} видалений з друзів.")
     return redirect('friends')
 
@@ -274,6 +300,25 @@ def create_route(request):
     return render(request, 'network/create_route.html', {'form': form})
 
 @login_required
-def routes(request):
-    all_routes = Route.objects.select_related('user').order_by('-id')
-    return render(request, 'network/routes.html', {'routes': all_routes})
+def settings_view(request):
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = SettingsForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            profile = form.save()
+
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+
+            pw = form.cleaned_data.get('password1')
+            if pw:
+                request.user.set_password(pw)
+                request.user.save()
+                update_session_auth_hash(request, request.user)
+
+            return redirect('settings')
+    else:
+        form = SettingsForm(instance=profile, initial={'email': request.user.email})
+
+    return render(request, 'network/settings.html', {'form': form})

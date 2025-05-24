@@ -8,9 +8,9 @@
     <div class="profile-header">
         <div class="avatar-section">
             {% if user.profile.avatar %}
-                <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="avatar-img">
+                <img src="{{ user.profile.avatar.url }}" alt="Avatar">
             {% else %}
-                <img src="{% static 'default-avatar.png' %}" alt="Default Avatar" class="avatar-img">
+                <img src="{% static 'default_avatar.png' %}" alt="Default Avatar">
             {% endif %}
         </div>
 
@@ -41,15 +41,19 @@
         {% if posts %}
             <div class="posts-grid">
                 {% for post in posts %}
-                    <div class="post-card profile-post-card">
-                        <img src="{{ post.image.url }}" alt="Пост">
-                        <div class="caption">{{ post.caption|truncatewords:10 }}</div>
-                        <div class="post-footer">
-                            <span>❤️ {{ post.likes.count }}</span>
-                            <span>{{ post.created_at|date:"d.m.Y" }}</span>
-                        </div>
-                    </div>
-                {% endfor %}
+    <div class="post-card profile-post-card">
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Пост">
+        {% else %}
+            <img src="{% static 'default_post.png' %}" alt="Пост без зображення">
+        {% endif %}
+        <div class="caption">{{ post.caption|truncatewords:10 }}</div>
+        <div class="post-footer">
+            <span>❤️ {{ post.likes.count }}</span>
+            <span>{{ post.created_at|date:"d.m.Y" }}</span>
+        </div>
+    </div>
+{% endfor %}
             </div>
         {% else %}
             <p class="no-posts">Цей користувач ще не створював постів.</p>

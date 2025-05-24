@@ -1,0 +1,33 @@
+{% extends 'network/base.html' %}
+{% block title %}Користувачі - WanderNet{% endblock %}
+
+{% block content %}
+<h2>Список користувачів</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Дія</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user != request.user %}
+                    <form method="post" action="{% url 'delete_user' user.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Видалити користувача {{ user.username }}?')">Видалити</button>
+                    </form>
+                    {% else %}
+                    <em>(це ви)</em>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

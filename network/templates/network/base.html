@@ -18,9 +18,11 @@
     <ul class="sidebar-links">
         <li class="sidebar-item"><a href="{% url 'friends' %}"><i class="fa-solid fa-user-friends"></i> Друзі</a></li>
         <li class="sidebar-item"><a href="{% url 'find_friends' %}"><i class="fa-solid fa-search"></i> Пошук</a></li>
-        <li class="sidebar-item"><a href=""><i class="fa-solid fa-map"></i> Карта</a></li>
         <li class="sidebar-item"><a href="{% url 'settings' %}"><i class="fa-solid fa-cog"></i> Налаштування</a></li>
         <li class="sidebar-item"><a href="{% url 'notifications' %}"><i class="fa-solid fa-bell"></i> Сповіщення</a></li>
+    {% if request.user.is_authenticated and request.user.is_admin %}
+        <li class="sidebar-item"><a href="{% url 'users_list' %}"><i class="fa-solid fa-users"></i> Користувачі</a></li>
+    {% endif %}
     </ul>
 </div>
 
