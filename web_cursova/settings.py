@@ -95,7 +95,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+<<<<<<< HEAD
 MEDIA_URL = '/media/'
+=======
+MEDIA_URL = '/media/' 
+>>>>>>> 4a007a8833aec50227e66952b3d1a4efa9fa2698
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'posts')
 LOGOUT_REDIRECT_URL = 'login'

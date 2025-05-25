@@ -1,4 +1,5 @@
 from django.test import TestCase
+<<<<<<< HEAD
 from network.models import Post, Profile, Comment, Route, CustomUser, FriendRequest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from network.forms import CommentForm, PostForm, RouteForm, SettingsForm, User
@@ -135,3 +136,5 @@ class ViewTests(TestCase):
 
 
 
+=======
+>>>>>>> 4a007a8833aec50227e66952b3d1a4efa9fa2698

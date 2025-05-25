@@ -61,7 +61,11 @@ class Comment(models.Model):
     route = models.ForeignKey(Route, related_name='comments', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
+<<<<<<< HEAD
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.post.caption}"
+=======
+    created_at = models.DateTimeField(auto_now_add=True)
+>>>>>>> 4a007a8833aec50227e66952b3d1a4efa9fa2698
