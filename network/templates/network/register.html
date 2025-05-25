@@ -1,0 +1,15 @@
+{% extends 'network/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Реєстрація</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success">Зареєструватися</button>
+</form>
+
+<p class="reg-text">Уже маєте акаунт? <a href="{% url 'login' %}">Увійти</a></p>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}

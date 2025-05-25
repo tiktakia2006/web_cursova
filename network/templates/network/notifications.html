@@ -1,0 +1,30 @@
+{% extends 'network/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+{% block content %}
+<h1>Сповіщення</h1>
+
+{% if friend_posts %}
+    <ul class="notifications-list">
+        {% for post in friend_posts %}
+            <li class="notification-item">
+                <div class="notification-user">
+                    {% if post.user.profile.avatar %}
+                        <img src="{{ post.user.profile.avatar.url }}" alt="{{ post.user.username }}" class="notif-avatar" />
+                    {% else %}
+                        <div class="notif-avatar-placeholder">{{ post.user.username|slice:":1"|upper }}</div>
+                    {% endif %}
+                    <strong>{{ post.user.username }}</strong> опублікував новий пост
+                </div>
+                <div class="notification-caption">{{ post.caption|truncatewords:15 }}</div>
+                <div class="notification-date">{{ post.created_at|date:"d.m.Y H:i" }}</div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас немає нових сповіщень від друзів.</p>
+{% endif %}
+{% endblock %}

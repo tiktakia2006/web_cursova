@@ -1,0 +1,43 @@
+{% extends 'network/base.html' %}
+{% block title %}Налаштування профілю{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <h2 class="mb-4 text-primary">Налаштування профілю</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-4">
+
+      <div class="col-md-6">
+        <label for="username" class="form-label fw-semibold">Ім'я користувача</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+      </div>
+
+      <div class="col-md-6">
+        <label for="email" class="form-label fw-semibold">Електронна пошта</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+      </div>
+
+      <div class="col-md-6">
+        <label for="password" class="form-label fw-semibold">Новий пароль</label>
+        <input type="password" class="form-control" id="password" name="password">
+      </div>
+
+      <div class="col-md-6">
+        <label for="passwordConfirm" class="form-label fw-semibold">Підтвердьте пароль</label>
+        <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm">
+      </div>
+
+      <div class="col-md-6">
+        <label for="avatar" class="form-label fw-semibold">Аватар</label>
+        <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*">
+      </div>
+
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-primary px-4">Зберегти зміни</button>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}

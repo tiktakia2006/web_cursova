@@ -1,0 +1,51 @@
+{% extends 'network/base.html' %}
+{% load static %}
+{% block title %}🔍 Пошук друзів{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="card shadow-sm rounded">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">🔍 Знайти друзів</h4>
+    </div>
+    <div class="card-body">
+      <form method="get" class="mb-4 d-flex">
+        <input type="text" name="q" class="form-control me-2" placeholder="Введіть ім’я користувача..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-outline-info">Пошук</button>
+      </form>
+
+      {% if results %}
+        <ul class="list-group">
+          {% for user in results %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" alt="avatar" class="rounded-circle me-3" width="45" height="45">
+                {% else %}
+                  <img src="{% static 'default-avatar.png' %}" alt="avatar" class="rounded-circle me-3" width="45" height="45">
+                {% endif %}
+                <a href="{% url 'profile' user.username %}" class="fw-bold text-decoration-none text-dark">{{ user.username }}</a>
+              </div>
+
+              {% if user.id in sent_requests %}
+                <span class="badge bg-secondary">Запит надіслано</span>
+              {% elif user in friends %}
+                <span class="badge bg-success">✓ У друзях</span>
+              {% else %}
+                <form method="post" action="{% url 'add_friend' user.id %}" class="mb-0">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-primary">Додати</button>
+                </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% elif request.GET.q %}
+        <div class="alert alert-warning mt-3" role="alert">
+          Нічого не знайдено за запитом <strong>{{ request.GET.q }}</strong>.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

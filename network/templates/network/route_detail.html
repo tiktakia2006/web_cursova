@@ -1,0 +1,38 @@
+{% extends 'network/base.html' %}
+{% load static %}
+{% block title %}Деталі маршруту{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="route-detail-wrapper">
+    <div class="route-header">
+        <div class="route-locations">
+            <div class="location-start">{{ route.start_location }}</div>
+            <div class="arrow">→</div>
+            <div class="location-end">{{ route.end_location }}</div>
+        </div>
+    </div>
+
+    {% if route.image %}
+    <div class="route-image">
+        <img src="{{ route.image.url }}" alt="Зображення маршруту" loading="lazy">
+    </div>
+    {% endif %}
+
+    <div class="route-description">
+        {{ route.description|linebreaks }}
+    </div>
+
+    <div class="route-author">
+    {% if route.user.profile.avatar %}
+    <img src="{{ route.user.profile.avatar.url }}" alt="{{ route.user.username }}" class="author-photo" />
+{% else %}
+    <div class="author-icon">{{ route.user.username|slice:":1"|upper }}</div>
+{% endif %}
+    <div class="author-name">Автор: <strong>{{ route.user.username }}</strong></div>
+</div>
+</div>
+{% endblock %}

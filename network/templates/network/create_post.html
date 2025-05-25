@@ -1,0 +1,41 @@
+{% extends 'network/base.html' %}
+
+{% block title %}Створити пост — WanderNet{% endblock %}
+
+{% block content %}
+<div class="create-post-wrapper">
+    <div class="card create-post-card">
+        <h2 class="create-post-title">📝 Створити новий пост</h2>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_caption">Опис:</label>
+                {{ form.caption }}
+                {% if form.caption.errors %}
+                    <ul class="form-errors">
+                        {% for error in form.caption.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_image">Зображення:</label>
+                {{ form.image }}
+                {% if form.image.errors %}
+                    <ul class="form-errors">
+                        {% for error in form.image.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-submit">📤 Опублікувати</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
